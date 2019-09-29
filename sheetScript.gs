@@ -347,3 +347,20 @@ function playlist(pl, sheetID){
   var playlistId = data[pl][0];
   return playlistId
 }
+
+function listAllChannels(sheet) {
+  const sheetID = PropertiesService.getScriptProperties().getProperty("sheetID")
+  if (!sheetID) onOpen()
+  const spreadsheet = SpreadsheetApp.openById(sheetID)
+  if (!sheet || !sheet.toString || sheet.toString() != 'Sheet') sheet = spreadsheet.getSheets()[0];
+  const channelRangeRow = 4; // Start of the range of the PlaylistID+ChannelID data
+  const channelRangeCol = 3; // Start of the range of the ChannelID data
+  
+  const channelIds = getAllChannelIds()
+  var nextRow = channelRangeRow
+  for (var i = 0; i < Math.floor(channelIds.length / 20); i++, nextRow++) {
+    sheet.insertRowBefore(nextRow).getRange(nextRow, channelRangeCol, 1, 20).setValues([channelIds.slice(i*20, (i+1)*20)])
+  }
+  if (channelIds.length % 20) // Add last row
+    sheet.insertRowBefore(nextRow).getRange(nextRow, channelRangeCol, 1, channelIds.length % 20).setValues([channelIds.slice(i*20)])
+}
